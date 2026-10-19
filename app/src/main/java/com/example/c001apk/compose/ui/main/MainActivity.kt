@@ -55,6 +55,8 @@ import com.example.c001apk.compose.util.CookieUtil.username
 import com.example.c001apk.compose.util.CookieUtil.versionCode
 import com.example.c001apk.compose.util.CookieUtil.versionName
 import com.example.c001apk.compose.util.CookieUtil.xAppDevice
+import com.example.c001apk.compose.util.IosDeviceUtils
+import com.example.c001apk.compose.util.IosHeaders
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -123,20 +125,18 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalUserPreferences provides preferences
             ) {
-                if (preferences.xAppDevice.isEmpty())
-                    viewModel.regenerateParams()
-
+                val iosDevice = IosDeviceUtils.current()
                 isLogin = preferences.isLogin
                 szlmId = preferences.szlmId
-                xAppDevice = preferences.xAppDevice
+                xAppDevice = IosHeaders.appDevice(iosDevice)
                 uid = preferences.uid
                 username = preferences.username
                 token = preferences.token
-                userAgent = preferences.userAgent
-                sdkInt = preferences.sdkInt
-                versionName = preferences.versionName
-                versionCode = preferences.versionCode
-                apiVersion = preferences.apiVersion
+                userAgent = IosHeaders.userAgent(iosDevice)
+                sdkInt = iosDevice.systemVersion
+                versionName = IosHeaders.APP_VERSION
+                versionCode = IosHeaders.APP_CODE
+                apiVersion = IosHeaders.API_VERSION
                 imageQuality = preferences.imageQuality
                 showEmoji = preferences.showEmoji
                 showSquare = preferences.showSquare

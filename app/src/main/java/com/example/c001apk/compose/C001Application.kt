@@ -5,6 +5,7 @@ import coil.Coil
 import coil.ImageLoader
 import com.example.c001apk.compose.util.CookieUtil.materialYou
 import com.example.c001apk.compose.util.AddCookiesInterceptor
+import com.example.c001apk.compose.util.IosDeviceUtils
 import com.example.c001apk.compose.util.dp
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
@@ -27,6 +28,8 @@ class C001Application : Application() {
         super.onCreate()
 
         c001Application = this
+        // 初始化并落盘 iOS 设备档案，确保首个 Coolapk API 请求就有完整身份。
+        IosDeviceUtils.current()
         if (materialYou) {
             DynamicColors.applyToActivitiesIfAvailable(this)
         }

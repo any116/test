@@ -19,6 +19,7 @@ import com.example.c001apk.compose.util.CookieUtil.isLogin
 import com.example.c001apk.compose.util.CookieUtil.message
 import com.example.c001apk.compose.util.CookieUtil.uid
 import com.example.c001apk.compose.util.encode
+import com.example.c001apk.compose.util.IosDeviceUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -82,6 +83,7 @@ class MessageViewModel @AssistedInject constructor(
 
     fun onLogout() {
         viewModelScope.launch {
+            IosDeviceUtils.onLogout()
             userPreferencesRepository.apply {
                 setUid(Constants.EMPTY_STRING)
                 setUserAvatar(Constants.EMPTY_STRING)

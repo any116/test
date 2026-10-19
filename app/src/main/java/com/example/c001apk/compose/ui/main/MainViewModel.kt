@@ -11,6 +11,8 @@ import com.example.c001apk.compose.ui.base.PrefsViewModel
 import com.example.c001apk.compose.util.CookieUtil
 import com.example.c001apk.compose.util.CookieUtil.SESSID
 import com.example.c001apk.compose.util.encode
+import com.example.c001apk.compose.util.CdidClient
+import com.example.c001apk.compose.util.IosDeviceUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,9 +55,23 @@ class MainViewModel @Inject constructor(
                                 setToken(login.token)
                                 setIsLogin(true)
                             }
+
+                            // 随机 UUID 适合匿名读接口；登录后换取服务端登记的 CDID，
+                            // 让点赞、回复等写接口使用 iOS 身份通过设备校验。
+                            if (!IosDeviceUtils.hasCdid()) {
+                                runCatching {
+                                    val cdid = CdidClient.fetch(
+                                        IosDeviceUtils.current(),
+                                        IosDeviceUtils.idfv(),
+                                        IosDeviceUtils.installId(),
+                                    )
+                                    IosDeviceUtils.setCdid(cdid)
+                                }.onFailure { it.printStackTrace() }
+                            }
                         }
 
                         if (response.body()?.message == "登录信息有误") {
+                            IosDeviceUtils.onLogout()
                             userPreferencesRepository.apply {
                                 setUid(EMPTY_STRING)
                                 setUserAvatar(EMPTY_STRING)

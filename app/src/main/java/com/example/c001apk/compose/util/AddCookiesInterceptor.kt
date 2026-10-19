@@ -1,13 +1,6 @@
 package com.example.c001apk.compose.util
 
-import com.example.c001apk.compose.constant.Constants.APP_ID
-import com.example.c001apk.compose.constant.Constants.CHANNEL
-import com.example.c001apk.compose.constant.Constants.DARK_MODE
-import com.example.c001apk.compose.constant.Constants.LOCALE
-import com.example.c001apk.compose.constant.Constants.MODE
-import com.example.c001apk.compose.constant.Constants.REQUEST_WITH
 import com.example.c001apk.compose.util.CookieUtil.SESSID
-import com.example.c001apk.compose.util.TokenDeviceUtils.getTokenV2
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -20,31 +13,24 @@ object AddCookiesInterceptor : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
+        val device = IosDeviceUtils.current()
         val builder: Request.Builder = chain.request().newBuilder()
-        val deviceCode = CookieUtil.xAppDevice
-        val token = deviceCode.getTokenV2()
         builder.apply {
-            addHeader("User-Agent", CookieUtil.userAgent)
-            addHeader("X-Requested-With", REQUEST_WITH)
-            addHeader("X-Sdk-Int", CookieUtil.sdkInt)
-            addHeader("X-Sdk-Locale", LOCALE)
-            addHeader("X-App-Id", APP_ID)
-            addHeader("X-App-Token", token)
-            addHeader("X-App-Version", CookieUtil.versionName)
-            addHeader("X-App-Code", CookieUtil.versionCode)
-            addHeader("X-Api-Version", CookieUtil.apiVersion)
-            addHeader("X-App-Device", deviceCode)
-            addHeader("X-Dark-Mode", DARK_MODE)
-            addHeader("X-App-Channel", CHANNEL)
-            addHeader("X-App-Mode", MODE)
-            addHeader("X-App-Supported", CookieUtil.versionCode)
-            addHeader("Content-Type", "application/x-www-form-urlencoded")
-            if (CookieUtil.isLogin)
-                addHeader(
+            // 使用 header() 覆盖调用方旧的 Android 头，避免重复头影响服务端解析。
+            IosHeaders.headers(device, IosDeviceUtils.nowSeconds()).forEach { (name, value) ->
+                header(name, value)
+            }
+            header("Content-Type", "application/x-www-form-urlencoded")
+            if (CookieUtil.isLogin) {
+                header(
                     "Cookie",
                     "uid=${CookieUtil.uid}; username=${CookieUtil.username}; token=${CookieUtil.token}"
                 )
-            else addHeader("Cookie", SESSID)
+            } else if (SESSID.isNotBlank()) {
+                header("Cookie", SESSID)
+            } else {
+                removeHeader("Cookie")
+            }
         }
         return chain.proceed(builder.build())
     }

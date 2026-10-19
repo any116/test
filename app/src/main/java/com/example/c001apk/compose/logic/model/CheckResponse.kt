@@ -16,7 +16,8 @@ data class CheckResponse(
         val uid: String,
         val username: String,
         val token: String,
-        val refreshToken: String,
+        // iOS checkLoginInfo 不一定返回 refreshToken。
+        val refreshToken: String?,
         val userAvatar: String,
         val notifyCount: NotifyCount,
     )
@@ -34,4 +35,3 @@ data class CheckResponse(
     )
 
 }
-
