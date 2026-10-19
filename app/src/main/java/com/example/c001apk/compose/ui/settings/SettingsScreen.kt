@@ -104,6 +104,8 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.materialkolor.PaletteStyle
 import java.util.Formatter
 
+private const val SHOW_SZLM_ID_SETTING = false
+
 /**
  * Created by bggRGjQaUbCoE on 2024/5/30
  */
@@ -187,12 +189,14 @@ fun SettingsScreen(
         ) {
 
             BasicListItem(leadingText = stringResource(id = R.string.app_name))
-            BasicListItem(
-                leadingImageVector = Icons.Outlined.Smartphone,
-                headlineText = "数字联盟ID",
-                supportingText = prefs.szlmId.ifEmpty { null }
-            ) {
-                showSZLMIDDialog = true
+            if (SHOW_SZLM_ID_SETTING) {
+                BasicListItem(
+                    leadingImageVector = Icons.Outlined.Smartphone,
+                    headlineText = "数字联盟ID",
+                    supportingText = prefs.szlmId.ifEmpty { null }
+                ) {
+                    showSZLMIDDialog = true
+                }
             }
             BasicListItem(
                 leadingImageVector = Icons.Outlined.DeveloperMode,
